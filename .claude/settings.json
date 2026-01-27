@@ -1,0 +1,31 @@
+{
+  "model": "opus",
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log -n *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+
+      "Bash(ls *)",
+      "Bash(pwd)",
+      "Bash(cat *)",
+      "Bash(mkdir -p *)",
+      "Bash(touch *)",
+
+      "Bash(make *)",
+      "Bash(python3 -m pytest *)",
+
+      "Bash(docker compose *)",
+
+      "mcp__claude-flow__*"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}
