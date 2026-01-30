@@ -19,14 +19,18 @@ def test_config_has_resource_ids():
     assert config.PAGE_SIZE == 5000
 
 
-def test_api_url():
+def test_api_url(monkeypatch):
+    # Ensure env var override doesn't affect this test
+    monkeypatch.delenv("LA311_API_BASE", raising=False)
     url = config.api_url(2024)
     assert "b7dx-7gc3" in url
 
 
-def test_api_url_unknown_year():
-    with pytest.raises(ValueError):
-        config.api_url(1999)
+def test_api_url_unknown_year(monkeypatch):
+    # Ensure env var override doesn't affect this test
+    monkeypatch.delenv("LA311_API_BASE", raising=False)
+    url = config.api_url(2099)
+    assert "ndkd-k878" in url
 
 
 # --- writer ---
@@ -57,6 +61,15 @@ def test_write_day_idempotent(tmp_path, monkeypatch):
         rec = json.loads(f.readline())
     assert rec["a"] == 2
 
+def test_api_url_env_override(monkeypatch):
+    monkeypatch.setenv("LA311_API_BASE", "https://example.com/foo.json")
+    url = config.api_url(2024)
+    assert url == "https://example.com/foo.json"
+    
+def test_api_url_env_override_resource_id(monkeypatch):
+    monkeypatch.setenv("LA311_API_BASE", "ndkd-k878")
+    url = config.api_url(2024)
+    assert url.endswith("/ndkd-k878.json")
 
 # --- cli ---
 

@@ -19,8 +19,24 @@ PAGE_SIZE = int(os.environ.get("LA311_PAGE_SIZE", "5000"))
 
 
 def api_url(year: int) -> str:
-    """Return the Socrata JSON endpoint for a given year."""
+    """
+    Return a Socrata API endpoint URL.
+
+    Priority:
+    1) LA311_API_BASE env var (can be full URL or a resource id like 'ndkd-k878')
+    2) Year-specific RESOURCE_IDS mapping
+    3) Fallback to the continuously-updated dataset
+    """
+    env = os.getenv("LA311_API_BASE")
+    if env:
+        # allow either full URL or just a dataset/resource id
+        if env.startswith("http://") or env.startswith("https://"):
+            return env
+        return f"https://data.lacity.org/resource/{env}.json"
+
     rid = RESOURCE_IDS.get(year)
-    if not rid:
-        raise ValueError(f"No known resource ID for year {year}. Known: {sorted(RESOURCE_IDS)}")
-    return f"{API_HOST}/resource/{rid}.json"
+    if rid:
+        return f"https://data.lacity.org/resource/{rid}.json"
+
+    # fallback: don't crash on new years
+    return "https://data.lacity.org/resource/ndkd-k878.json"
